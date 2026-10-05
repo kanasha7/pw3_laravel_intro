@@ -7,49 +7,48 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-
     /**
-     * Exibe a listagem de usuarios com superte a filtro de busca
+     * Exibe a listagem de usuários com suporte a filtro de busca.
      */
-    public function index(Request $request){
-        // Captura o termo de busca enviado pelo GET
+    public function index(Request $request)
+    {
+        // Captura o termo de busca enviado pelo formulário GET
         $busca = $request->input('busca');
-        
-        // Se houver busca, filtra pro nome; caso contrario, busca todos ordenados por nome
-        if ($busca){
-            $usuarios = User::where('name', 'like', "%($busca)%", 'and')->orderBy('name', 'ASC')->get();
-        } else{
-            $usuarios = User::orderBy('name', 'ASC')->get();
+
+        // Se houver busca, filtra por nome; caso contrário, busca todos ordenados por nome
+        if ($busca) {
+            $usuarios = User::where('name', 'like', "%{$busca}%", 'and')
+                ->orderBy('name', 'asc')
+                ->get();
+        } else {
+            $usuarios = User::orderBy('name', 'asc')->get();
         }
 
-        //Retorna a view do painel passando a coleção de usuarios e o termo de pesquisa
+        // Retorna a view do painel passando a coleção de usuários e o termo pesquisado
         return view('admin.dashboard', compact('usuarios', 'busca'));
     }
+
     /**
-     * Exibe o formuçário de cadastro de usuario
+     * Exibe o formulário de cadastro de usuários.
      */
-    public function create(){
+    public function create()
+    {
         return view('users.create');
     }
 
     /**
-     * Salvar o novo usuario no banco de dados com validação
+     * Salva o novo usuário no banco de dados com validação.
      */
-    public function store(Request $request){
-        //Validação dos campos do formulário
-        $dadosValidos = $request->validate([
+    public function store(Request $request)
+    {
+        $dadosValidados = $request->validate([
             'name' => 'required|min:3|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
         ]);
 
+        User::create($dadosValidados);
 
-        //Persistencia no banco de dados usando orm eloquente
-        User::create($dadosValidos);
-
-
-        //Redirecionar para o painel administrativo com mensagem de sucesso
-        return redirect('/admin')->with('sucesso','Usuario cadastrado com sucesso');
-
+        return redirect('/admin')->with('sucesso', 'Usuário cadastrado com sucesso');
     }
 }
