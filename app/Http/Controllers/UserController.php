@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -84,5 +85,17 @@ class UserController extends Controller
         $usuario->update($dadosValidados);
 
         return redirect('/admin')->with('sucesso', 'Usuário atualizado com sucesso.');
+    }
+
+    /**
+     * Remove o registro do usuário no banco de dados
+     */
+    public function destroy($id){
+        $usuario = User::findOrFail($id);
+
+        //Executa a exclusão no registro
+        $usuario->delete();
+
+        return redirect('/admin')->with('sucesso', 'Item removido com sucesso.');
     }
 }
